@@ -88,6 +88,11 @@ public class Tests
 	    Test("Equal cards is tie", tie, "2S AH 4H 5S 6C", "AD 4C 5H 6H 2C");
     }
     
+    @Test
+    public void RandomizedTest1(){
+	    Test("Random wins", win, "TS KS 5S 9S AC", "JH 8S TH AH QH");
+    }
+    
     private void Test(String description, PokerHand.Result expected, String playerHand, String opponentHand)
     {
         PokerHand player = new PokerHand(playerHand);

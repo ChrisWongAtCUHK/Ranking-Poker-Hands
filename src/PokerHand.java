@@ -75,7 +75,7 @@ public class PokerHand {
 			this.rank = 1;
 		} else {
 			this.rank = 0;
-			for(int i = 0; i < this.kinds.length; i++){
+			for(int i = this.kinds.length - 1; i >= 0 ; i--){
 				this.highKinds.add(this.kinds[i]);
 			}
 		}
