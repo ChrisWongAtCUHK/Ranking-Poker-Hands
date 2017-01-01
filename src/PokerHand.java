@@ -11,14 +11,16 @@ import java.util.Comparator;
 public class PokerHand {
 	private final String[] KINDS = {"2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"};
 	private final String[] SUITS = {"S", "H", "D", "C"};
-
+	private String[] cards;
+	private int rank;
+	
 	/**
 	 * Constructor
 	 * @param cards
 	 */
 	public PokerHand(String cardsString) {
 		// cards = split the hand by space " "
-		String[] cards = cardsString.split(" ");
+		this.cards = cardsString.split(" ");
 		
 		// sort cards by kind
 		Arrays.sort(cards, new Comparator<String>(){
@@ -37,6 +39,44 @@ public class PokerHand {
 			}
 			
 		});		
+	
+		// if kinds are all consecutive, it is straight
+		if(isStraight()){
+			this.rank = 4;
+		} else {
+			this.rank = 0;
+		}
+	}
+	
+	/**
+	 * Accessor of rank
+	 * @return
+	 */
+	public int getRank(){
+		return this.rank;
+	}
+	
+	/**
+	 * Check if the hand is straight
+	 * @return
+	 */
+	private boolean isStraight(){
+		boolean isStraight = true;
+		
+		for(int i = 0; i < this.cards.length - 1; i++){
+			int kind1 = Arrays.asList(KINDS).indexOf(cards[i].substring(0, 1));
+			int kind2 = Arrays.asList(KINDS).indexOf(cards[i + 1].substring(0, 1));
+			if(kind2 != kind1 + 1){
+				// special case: 2 3 4 5 A
+				if(kind1 == 3 && kind2 == 12){
+					return true;
+				}
+				// normal cases
+				return false;
+			}
+		}
+		
+		return isStraight;
 	}
 	
 	/**
