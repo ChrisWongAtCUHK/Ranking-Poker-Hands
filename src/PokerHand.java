@@ -14,6 +14,7 @@ public class PokerHand {
 	private String[] cards;
 	private int rank;
 	private String highCard1;
+	private String highCard2;
 	
 	/**
 	 * Constructor
@@ -43,21 +44,19 @@ public class PokerHand {
 
 		boolean isStraight = isStraight();
 		boolean isFlush = isFlush();
-		if(isStraight){			
-			if(getKind(cards[3]) == 3 && getKind(cards[4]) == 12){
-				// special case: 2 3 4 5 A
-				this.highCard1 = cards[3];
-			} else {
-				// normal cases
-				this.highCard1 = cards[4];
-			}
-			
-		} else {
-			this.highCard1 = cards[4];
-		} 
+		boolean isFourCard = isFourCard();
 		
+		if(isFourCard){
+			this.rank = 7;
+		} else {
+			this.rank = 0;
+			this.highCard1 = cards[4];
+		}	
+
 		if(isStraight && isFlush){
 			this.rank = 8;
+		} if(isFourCard){
+			this.rank = 7;
 		} else if(isFlush){
 			this.rank = 5;
 		} else if(isStraight){
@@ -80,6 +79,14 @@ public class PokerHand {
 	 */
 	public String getHighCard1(){
 		return this.highCard1;
+	}
+	
+	/**
+	 * Accessor of highCard2
+	 * @return
+	 */
+	public String getHighCard2(){
+		return this.highCard2;
 	}
 	
 	/**
@@ -113,6 +120,15 @@ public class PokerHand {
 			}
 		}
 		
+		// get the card of highest kind
+		if(getKind(cards[3]) == 3 && getKind(cards[4]) == 12){
+			// special case: 2 3 4 5 A
+			this.highCard1 = cards[3];
+		} else {
+			// normal cases
+			this.highCard1 = cards[4];
+		}
+		
 		return isStraight;
 	}
 	
@@ -131,6 +147,36 @@ public class PokerHand {
 		return isFlush;
 	}
 	
+	/**
+	 * Check if the hand is four cards of a kind
+	 * @return
+	 */
+	private boolean isFourCard(){
+
+		int kind0 = getKind(cards[0]);
+		int kind1 = getKind(cards[1]);
+		int kind2 = getKind(cards[2]);
+		int kind3 = getKind(cards[3]);
+		int kind4 = getKind(cards[4]);
+		
+		// first case, 1 to 4 cards
+		if(kind1 == kind0 && kind2 == kind0 &&
+				kind3 == kind0){
+			this.highCard1 = this.cards[0];
+			this.highCard2 = this.cards[4];
+			return true;
+		}
+		
+		// second case, 2 to 5 cards
+		if(kind2 == kind1 && kind3 == kind1 &&
+				kind4 == kind1){
+			this.highCard1 = this.cards[1];
+			this.highCard2 = this.cards[0];
+			return true;
+		}
+		
+		return false;
+	}
 	/**
 	 * Compare this hand with another hand
 	 * @param	hand another hand
