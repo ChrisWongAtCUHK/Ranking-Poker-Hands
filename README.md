@@ -1,3 +1,4 @@
+<a href="https://www.codewars.com/kata/ranking-poker-hands/java">Ranking Poker Hands</a>  
 kinds = {2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K, A}
 suits = {S, H, D, C}
 
