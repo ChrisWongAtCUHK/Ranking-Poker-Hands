@@ -375,13 +375,3 @@ public class PokerHand {
 		}
 	}
 }
-
-/**
- * Rank
- * @author chriswong
- *
- */
-interface Rank{
-	public int Ranking = 0;
-	public int compare(Rank rank);
-}
