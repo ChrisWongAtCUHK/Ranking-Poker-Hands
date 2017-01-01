@@ -12,6 +12,7 @@ public class PokerHand {
 	private final String[] KINDS = {"2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"};
 
 	private String[] cards;
+	private int[] kinds = new int[5];
 	private int rank;
 	private String highCard1;
 	private String highCard2;
@@ -42,20 +43,21 @@ public class PokerHand {
 			}
 			
 		});		
-
+		
+		for(int i = 0 ;i < this.cards.length; i++){
+			this.kinds[i] = getKind(cards[i]);
+		}
+		
 		boolean isStraight = isStraight();
 		boolean isFlush = isFlush();
-		boolean isFourCard = isFourCard();
-		boolean isThreeCard = isThreeCard();
-
+		
 		if(isStraight && isFlush){
 			this.rank = 8;
-		} else if(isFourCard){
+		} else if(isFourCard()){
 			this.rank = 7;
-		} else if(isThreeCard){
+		} else if(isThreeCard()){
 			// check if the hand is full house
-			boolean isFullHouse = isFullHouse();
-			if(isFullHouse){
+			if(isFullHouse()){
 				this.rank = 6;
 			} else {
 				this.rank = 3;
@@ -64,6 +66,8 @@ public class PokerHand {
 			this.rank = 5;
 		} else if(isStraight){
 			this.rank = 4;
+		} else if(isTwoPairs()){
+			
 		} else {
 			this.rank = 0;
 			this.highCard1 = cards[4];
@@ -120,12 +124,10 @@ public class PokerHand {
 		boolean isStraight = true;
 		
 		for(int i = 0; i < this.cards.length - 1; i++){
-			int kind1 = getKind(cards[i]);
-			int kind2 = getKind(cards[i + 1]);
 			// not the consecutive kind
-			if(kind2 != kind1 + 1){
+			if(this.kinds[i + 1] != this.kinds[i] + 1){
 				// special case: 2 3 4 5 A
-				if(kind1 == 3 && kind2 == 12){
+				if(this.kinds[i] == 3 && this.kinds[i + 1] == 12){
 					return true;
 				}
 				// normal cases
@@ -134,7 +136,7 @@ public class PokerHand {
 		}
 		
 		// get the card of highest kind
-		if(getKind(cards[3]) == 3 && getKind(cards[4]) == 12){
+		if(this.kinds[3] == 3 && this.kinds[4] == 12){
 			// special case: 2 3 4 5 A
 			this.highCard1 = cards[3];
 		} else {
@@ -165,23 +167,17 @@ public class PokerHand {
 	 * @return
 	 */
 	private boolean isFourCard(){
-		int kind0 = getKind(cards[0]);
-		int kind1 = getKind(cards[1]);
-		int kind2 = getKind(cards[2]);
-		int kind3 = getKind(cards[3]);
-		int kind4 = getKind(cards[4]);
-		
 		// first case, 1 to 4 cards
-		if(kind1 == kind0 && kind2 == kind0 &&
-				kind3 == kind0){
+		if(this.kinds[1] == this.kinds[0] && this.kinds[2] == this.kinds[0] &&
+				this.kinds[3] == this.kinds[0]){
 			this.highCard1 = this.cards[0];
 			this.highCard2 = this.cards[4];
 			return true;
 		}
 		
 		// second case, 2 to 5 cards
-		if(kind2 == kind1 && kind3 == kind1 &&
-				kind4 == kind1){
+		if(this.kinds[2] == this.kinds[1] && this.kinds[3] == this.kinds[1] &&
+				this.kinds[4] == this.kinds[1]){
 			this.highCard1 = this.cards[1];
 			this.highCard2 = this.cards[0];
 			return true;
@@ -195,26 +191,20 @@ public class PokerHand {
 	 * @return
 	 */
 	private boolean isThreeCard(){
-		int kind0 = getKind(cards[0]);
-		int kind1 = getKind(cards[1]);
-		int kind2 = getKind(cards[2]);
-		int kind3 = getKind(cards[3]);
-		int kind4 = getKind(cards[4]);
-		
 		// first case, 1 to 3 cards
-		if(kind1 == kind0 && kind2 == kind0){
+		if(this.kinds[1] == this.kinds[0] && this.kinds[2] == this.kinds[0]){
 			this.highCard1 = this.cards[0];
 			return true;
 		}
 		
 		// second case, 2 to 4 cards
-		if(kind2 == kind1 && kind3 == kind1){
+		if(this.kinds[2] == this.kinds[1] && this.kinds[3] == this.kinds[1]){
 			this.highCard1 = this.cards[1];
 			return true;
 		}
 		
 		// third case, 3 to 5 cards
-		if(kind3 == kind2 && kind4 == kind2){
+		if(this.kinds[3] == this.kinds[2] && this.kinds[4] == this.kinds[2]){
 			this.highCard1 = this.cards[2];
 			return true;
 		}
@@ -229,12 +219,9 @@ public class PokerHand {
 	private boolean isFullHouse(){
 		// first case, 1 to 3 cards
 		if(this.highCard1 == this.cards[0]){
-			int kind3 = getKind(this.cards[3]);
-			int kind4 = getKind(this.cards[4]);
-			
 			this.highCard2 = this.cards[3];
 			// another pair
-			if(kind3 == kind4){
+			if(this.kinds[3] == this.kinds[4]){
 				return true;
 			} else {
 				this.highCard3 = this.cards[3];
@@ -263,6 +250,15 @@ public class PokerHand {
 				return false;
 			}
 		}
+		
+		return false;
+	}
+	
+	/**
+	 * Check if the hand is Two Pairs
+	 * @return
+	 */
+	private boolean isTwoPairs(){
 		
 		return false;
 	}
