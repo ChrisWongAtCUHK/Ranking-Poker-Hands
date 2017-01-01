@@ -98,6 +98,11 @@ public class Tests
 	    Test("Random wins", win, "7C 7S KH 2H 7H", "7C 7S 3S 7H 5S");
     }
     
+    @Test
+    public void RandomizedTest3(){
+	    Test("Random wins", win, "4C 5C 9C 8C KC", "3S 8S 9S 5S KS");
+    }
+    
     private void Test(String description, PokerHand.Result expected, String playerHand, String opponentHand)
     {
         PokerHand player = new PokerHand(playerHand);

@@ -64,9 +64,9 @@ public class PokerHand {
 			}
 		} else if(isFlush){
 			this.rank = 5;
-			
-			// this line is avoid special case
-			this.highKinds.add(this.kinds[4]);
+			for(int i = this.kinds.length - 1; i >= 0 ; i--){
+				this.highKinds.add(this.kinds[i]);
+			}
 		} else if(isStraight){
 			this.rank = 4;
 		} else if(isTwoPairs()){
@@ -352,7 +352,6 @@ public class PokerHand {
 		} else {
 			switch(this.rank){
 				case 8:
-				case 5:
 				case 4:
 					// for Straight Flush, Straight or Flush
 					return compare(this.getHighKinds(), hand.getHighKinds(), 1);
@@ -362,13 +361,14 @@ public class PokerHand {
 					return compare(this.getHighKinds(), hand.getHighKinds(), 2);
 				case 3:
 				case 2:
-					// for Three Cards of a Kind and // for Two Pairs
+					// for Three Cards of a Kind and for Two Pairs
 					return compare(this.getHighKinds(), hand.getHighKinds(), 3);					
 				case 1:
 					// for One Pair
 					return compare(this.getHighKinds(), hand.getHighKinds(), 4);
+				case 5:
 				case 0:
-					// for High Card
+					// for Flush and High Card
 					return compare(this.getHighKinds(), hand.getHighKinds(), 5);
 				default:
 					return Result.TIE;
