@@ -13,6 +13,7 @@ public class PokerHand {
 	private final String[] SUITS = {"S", "H", "D", "C"};
 	private String[] cards;
 	private int rank;
+	private String highCard1;
 	
 	/**
 	 * Constructor
@@ -43,8 +44,18 @@ public class PokerHand {
 		// if kinds are all consecutive, it is straight
 		if(isStraight()){
 			this.rank = 4;
+			
+			if(getKind(cards[3]) == 3 && getKind(cards[4]) == 12){
+				// special case: 2 3 4 5 A
+				this.highCard1 = cards[3];
+			} else {
+				// normal cases
+				this.highCard1 = cards[4];
+			}
+			
 		} else {
 			this.rank = 0;
+			this.highCard1 = cards[4];
 		}
 	}
 	
@@ -57,6 +68,24 @@ public class PokerHand {
 	}
 	
 	/**
+	 * Accessor of highCard1
+	 * @return
+	 */
+	public String getHighCard1(){
+		return this.highCard1;
+	}
+	
+	/**
+	 * Get the kind of a card, e.g. AS is 12, 2H is 1
+	 * @param card
+	 * @return
+	 */
+	private int getKind(String card){
+		int kind = Arrays.asList(KINDS).indexOf(card.substring(0, 1));
+		return kind;
+	}
+	
+	/**
 	 * Check if the hand is straight
 	 * @return
 	 */
@@ -64,8 +93,8 @@ public class PokerHand {
 		boolean isStraight = true;
 		
 		for(int i = 0; i < this.cards.length - 1; i++){
-			int kind1 = Arrays.asList(KINDS).indexOf(cards[i].substring(0, 1));
-			int kind2 = Arrays.asList(KINDS).indexOf(cards[i + 1].substring(0, 1));
+			int kind1 = getKind(cards[i]);
+			int kind2 = getKind(cards[i + 1]);
 			if(kind2 != kind1 + 1){
 				// special case: 2 3 4 5 A
 				if(kind1 == 3 && kind2 == 12){
@@ -77,6 +106,15 @@ public class PokerHand {
 		}
 		
 		return isStraight;
+	}
+	
+	/**
+	 * Check if the hand is straight
+	 * @return
+	 */
+	private boolean isFlush(){
+		boolean isFlush = true;
+		return isFlush;
 	}
 	
 	/**
