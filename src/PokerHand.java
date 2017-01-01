@@ -210,32 +210,33 @@ public class PokerHand {
 	private boolean isFullHouse(){
 		// first case, 1 to 3 cards
 		if(this.highKinds.get(0) == this.kinds[0]){
-			this.highKinds.add(this.kinds[3]);
-			
 			// another pair
 			if(this.kinds[3] == this.kinds[4]){
+				this.highKinds.add(this.kinds[3]);
 				return true;
 			} else {
 				this.highKinds.add(this.kinds[4]);
+				this.highKinds.add(this.kinds[3]);
 				return false;
 			}
 		}
 		
 		// second case, 2 to 4 cards
 		if(this.highKinds.get(0) == this.kinds[1]){
-			this.highKinds.add(this.kinds[0]);
 			this.highKinds.add(this.kinds[4]);
+			this.highKinds.add(this.kinds[0]);
 			return false;
 		}
 		
 		// third case, 3 to 5 cards
 		if(this.highKinds.get(0) == this.kinds[2]){
-			this.highKinds.add(this.kinds[0]);
 			// another pair
 			if(this.kinds[0] == this.kinds[1]){
+				this.highKinds.add(this.kinds[0]);
 				return true;
 			} else {
 				this.highKinds.add(this.kinds[1]);
+				this.highKinds.add(this.kinds[0]);
 				return false;
 			}
 		}

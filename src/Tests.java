@@ -92,6 +92,11 @@ public class Tests
     public void RandomizedTest1(){
 	    Test("Random wins", win, "TS KS 5S 9S AC", "JH 8S TH AH QH");
     }
+
+    @Test
+    public void RandomizedTest2(){
+	    Test("Random wins", win, "7C 7S KH 2H 7H", "7C 7S 3S 7H 5S");
+    }
     
     private void Test(String description, PokerHand.Result expected, String playerHand, String opponentHand)
     {
