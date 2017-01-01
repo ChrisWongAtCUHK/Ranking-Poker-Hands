@@ -67,7 +67,7 @@ public class PokerHand {
 		} else if(isStraight){
 			this.rank = 4;
 		} else if(isTwoPairs()){
-			
+			this.rank = 2;
 		} else {
 			this.rank = 0;
 			this.highCard1 = cards[4];
@@ -259,6 +259,29 @@ public class PokerHand {
 	 * @return
 	 */
 	private boolean isTwoPairs(){
+		// 1st case: 1 & 2, 3 & 4
+		if(this.kinds[0] == this.kinds[1] && this.kinds[2] == this.kinds[3]){
+			this.highCard1 = this.cards[2];
+			this.highCard2 = this.cards[0];
+			this.highCard3 = this.cards[4];
+			return true;
+		}
+			
+		// 2nd case: 1 & 2, 4 & 5
+		if(this.kinds[0] == this.kinds[1] && this.kinds[3] == this.kinds[4]){
+			this.highCard1 = this.cards[3];
+			this.highCard2 = this.cards[0];
+			this.highCard3 = this.cards[2];
+			return true;
+		}
+		
+		// 3rd case: 2 & 3, 4 & 5
+		if(this.kinds[1] == this.kinds[2] && this.kinds[3] == this.kinds[4]){
+			this.highCard1 = this.cards[3];
+			this.highCard2 = this.cards[1];
+			this.highCard3 = this.cards[0];
+			return true;
+		}
 		
 		return false;
 	}
