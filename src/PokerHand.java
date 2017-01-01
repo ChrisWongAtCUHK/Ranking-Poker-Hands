@@ -1,7 +1,6 @@
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-
 
 /**
  * 
@@ -14,9 +13,8 @@ public class PokerHand {
 	private String[] cards;
 	private int[] kinds = new int[5];
 	private int rank;
-	private String highCard1;
-	private String highCard2;
-	private String highCard3;
+	// store the kinds of cards descendingly
+	private ArrayList<Integer> highKinds = new ArrayList<Integer>();	
 	
 	/**
 	 * Constructor
@@ -68,9 +66,13 @@ public class PokerHand {
 			this.rank = 4;
 		} else if(isTwoPairs()){
 			this.rank = 2;
+		} else if(isOnePair()){
+			this.rank = 2;
 		} else {
 			this.rank = 0;
-			this.highCard1 = cards[4];
+			for(int i = 0; i < this.kinds.length; i++){
+				this.highKinds.add(this.kinds[i]);
+			}
 		}
 	}
 	
@@ -83,27 +85,11 @@ public class PokerHand {
 	}
 	
 	/**
-	 * Accessor of highCard1
+	 * Accessor of high kinds
 	 * @return
 	 */
-	public String getHighCard1(){
-		return this.highCard1;
-	}
-	
-	/**
-	 * Accessor of highCard2
-	 * @return
-	 */
-	public String getHighCard2(){
-		return this.highCard2;
-	}
-	
-	/**
-	 * Accessor of highCard3
-	 * @return
-	 */
-	public String getHighCard3(){
-		return this.highCard3;
+	public ArrayList<Integer> getHighKinds(){
+		return this.highKinds;
 	}
 	
 	/**
@@ -138,10 +124,10 @@ public class PokerHand {
 		// get the card of highest kind
 		if(this.kinds[3] == 3 && this.kinds[4] == 12){
 			// special case: 2 3 4 5 A
-			this.highCard1 = cards[3];
+			this.highKinds.add(this.kinds[3]);
 		} else {
 			// normal cases
-			this.highCard1 = cards[4];
+			this.highKinds.add(this.kinds[4]);
 		}
 		
 		return isStraight;
@@ -170,16 +156,16 @@ public class PokerHand {
 		// first case, 1 to 4 cards
 		if(this.kinds[1] == this.kinds[0] && this.kinds[2] == this.kinds[0] &&
 				this.kinds[3] == this.kinds[0]){
-			this.highCard1 = this.cards[0];
-			this.highCard2 = this.cards[4];
+			this.highKinds.add(this.kinds[0]);
+			this.highKinds.add(this.kinds[4]);
 			return true;
 		}
 		
 		// second case, 2 to 5 cards
 		if(this.kinds[2] == this.kinds[1] && this.kinds[3] == this.kinds[1] &&
 				this.kinds[4] == this.kinds[1]){
-			this.highCard1 = this.cards[1];
-			this.highCard2 = this.cards[0];
+			this.highKinds.add(this.kinds[1]);
+			this.highKinds.add(this.kinds[0]);
 			return true;
 		}
 		
@@ -193,19 +179,19 @@ public class PokerHand {
 	private boolean isThreeCard(){
 		// first case, 1 to 3 cards
 		if(this.kinds[1] == this.kinds[0] && this.kinds[2] == this.kinds[0]){
-			this.highCard1 = this.cards[0];
+			this.highKinds.add(this.kinds[0]);
 			return true;
 		}
 		
 		// second case, 2 to 4 cards
 		if(this.kinds[2] == this.kinds[1] && this.kinds[3] == this.kinds[1]){
-			this.highCard1 = this.cards[1];
+			this.highKinds.add(this.kinds[1]);
 			return true;
 		}
 		
 		// third case, 3 to 5 cards
 		if(this.kinds[3] == this.kinds[2] && this.kinds[4] == this.kinds[2]){
-			this.highCard1 = this.cards[2];
+			this.highKinds.add(this.kinds[2]);
 			return true;
 		}
 		
@@ -218,35 +204,33 @@ public class PokerHand {
 	 */
 	private boolean isFullHouse(){
 		// first case, 1 to 3 cards
-		if(this.highCard1 == this.cards[0]){
-			this.highCard2 = this.cards[3];
+		if(this.highKinds.get(0) == this.kinds[0]){
+			this.highKinds.add(this.kinds[3]);
+			
 			// another pair
 			if(this.kinds[3] == this.kinds[4]){
 				return true;
 			} else {
-				this.highCard3 = this.cards[3];
+				this.highKinds.add(this.kinds[4]);
 				return false;
 			}
 		}
 		
 		// second case, 2 to 4 cards
-		if(this.highCard1 == this.cards[1]){
-			this.highCard2 = this.cards[0];
-			this.highCard3 = this.cards[4];
+		if(this.highKinds.get(0) == this.kinds[1]){
+			this.highKinds.add(this.kinds[0]);
+			this.highKinds.add(this.kinds[4]);
 			return false;
 		}
 		
 		// third case, 3 to 5 cards
-		if(this.highCard1 == this.cards[2]){
-			int kind0 = getKind(this.cards[0]);
-			int kind1 = getKind(this.cards[1]);
-			
-			this.highCard2 = this.cards[0];
+		if(this.highKinds.get(0) == this.kinds[2]){
+			this.highKinds.add(this.kinds[0]);
 			// another pair
-			if(kind0 == kind1){
+			if(this.kinds[0] == this.kinds[1]){
 				return true;
 			} else {
-				this.highCard3 = this.cards[1];
+				this.highKinds.add(this.kinds[1]);
 				return false;
 			}
 		}
@@ -261,29 +245,92 @@ public class PokerHand {
 	private boolean isTwoPairs(){
 		// 1st case: 1 & 2, 3 & 4
 		if(this.kinds[0] == this.kinds[1] && this.kinds[2] == this.kinds[3]){
-			this.highCard1 = this.cards[2];
-			this.highCard2 = this.cards[0];
-			this.highCard3 = this.cards[4];
+			this.highKinds.add(this.kinds[2]);
+			this.highKinds.add(this.kinds[0]);
+			this.highKinds.add(this.kinds[4]);
 			return true;
 		}
 			
 		// 2nd case: 1 & 2, 4 & 5
 		if(this.kinds[0] == this.kinds[1] && this.kinds[3] == this.kinds[4]){
-			this.highCard1 = this.cards[3];
-			this.highCard2 = this.cards[0];
-			this.highCard3 = this.cards[2];
+			this.highKinds.add(this.kinds[3]);
+			this.highKinds.add(this.kinds[0]);
+			this.highKinds.add(this.kinds[2]);
 			return true;
 		}
 		
 		// 3rd case: 2 & 3, 4 & 5
 		if(this.kinds[1] == this.kinds[2] && this.kinds[3] == this.kinds[4]){
-			this.highCard1 = this.cards[3];
-			this.highCard2 = this.cards[1];
-			this.highCard3 = this.cards[0];
+			this.highKinds.add(this.kinds[3]);
+			this.highKinds.add(this.kinds[1]);
+			this.highKinds.add(this.kinds[0]);
 			return true;
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Check if the hand is One Pair
+	 * @return
+	 */
+	private boolean isOnePair(){
+		// 1st case: 1 & 2
+		if(this.kinds[0] == this.kinds[1]){
+			this.highKinds.add(this.kinds[0]);
+			this.highKinds.add(this.kinds[4]);
+			this.highKinds.add(this.kinds[3]);
+			this.highKinds.add(this.kinds[2]);
+			return true;
+		}
+		
+		// 2nd case: 2 & 3
+		if(this.kinds[1] == this.kinds[2]){
+			this.highKinds.add(this.kinds[1]);
+			this.highKinds.add(this.kinds[4]);
+			this.highKinds.add(this.kinds[3]);
+			this.highKinds.add(this.kinds[0]);
+			return true;
+		}
+		
+		// 3rd case: 3 & 4
+		if(this.kinds[2] == this.kinds[3]){
+			this.highKinds.add(this.kinds[2]);
+			this.highKinds.add(this.kinds[4]);
+			this.highKinds.add(this.kinds[1]);
+			this.highKinds.add(this.kinds[0]);
+			return true;
+		}
+		
+		// 4th case: 4 & 5
+		if(this.kinds[3] == this.kinds[4]){
+			this.highKinds.add(this.kinds[3]);
+			this.highKinds.add(this.kinds[2]);
+			this.highKinds.add(this.kinds[1]);
+			this.highKinds.add(this.kinds[0]);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Compare 2 lists of Integer, according to the specified length
+	 * @param list1
+	 * @param list2
+	 * @param length
+	 * @return
+	 */
+	private static Result compare(ArrayList<Integer> list1, ArrayList<Integer> list2, int length){
+		for(int i = 0; i < length; i++){
+			if(list1.get(i) > list2.get(i)){
+				return Result.WIN;
+			} else if(list1.get(i) < list2.get(i)){
+				return Result.LOSS;
+			}
+		}
+		
+		return Result.TIE;
 	}
 	
 	/**
@@ -292,9 +339,36 @@ public class PokerHand {
 	 * @return	result
 	 */
 	public Result compareWith(PokerHand hand){
-		return Result.WIN;
+		if(this.rank > hand.getRank()){
+			return Result.WIN;
+		} else if(this.rank < hand.getRank()){
+			return Result.LOSS;
+		} else {
+			switch(this.rank){
+				case 8:
+				case 5:
+				case 4:
+					// for Straight Flush, Straight or Flush
+					return compare(this.getHighKinds(), hand.getHighKinds(), 1);
+				case 7:
+				case 6:
+					// for Four Cards of a Kind and Full House
+					return compare(this.getHighKinds(), hand.getHighKinds(), 2);
+				case 3:
+				case 2:
+					// for Three Cards of a Kind and // for Two Pairs
+					return compare(this.getHighKinds(), hand.getHighKinds(), 3);					
+				case 1:
+					// for One Pair
+					return compare(this.getHighKinds(), hand.getHighKinds(), 4);
+				case 0:
+					// for High Card
+					return compare(this.getHighKinds(), hand.getHighKinds(), 5);
+				default:
+					return Result.TIE;
+			}
+		}
 	}
-	
 }
 
 /**
