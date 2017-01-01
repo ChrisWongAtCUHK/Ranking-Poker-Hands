@@ -15,6 +15,7 @@ public class PokerHand {
 	private int rank;
 	private String highCard1;
 	private String highCard2;
+	private String highCard3;
 	
 	/**
 	 * Constructor
@@ -45,24 +46,28 @@ public class PokerHand {
 		boolean isStraight = isStraight();
 		boolean isFlush = isFlush();
 		boolean isFourCard = isFourCard();
-		
-		if(isFourCard){
-			this.rank = 7;
-		} else {
-			this.rank = 0;
-			this.highCard1 = cards[4];
-		}	
+		boolean isThreeCard = isThreeCard();
 
 		if(isStraight && isFlush){
 			this.rank = 8;
-		} if(isFourCard){
+		} else if(isFourCard){
 			this.rank = 7;
+		} else if(isThreeCard){
+			// check if the hand is full house
+			boolean isFullHouse = isFullHouse();
+			if(isFullHouse){
+				this.rank = 6;
+			} else {
+				this.rank = 3;
+			}
 		} else if(isFlush){
 			this.rank = 5;
 		} else if(isStraight){
 			this.rank = 4;
+		} else {
+			this.rank = 0;
+			this.highCard1 = cards[4];
 		}
-		
 	}
 	
 	/**
@@ -87,6 +92,14 @@ public class PokerHand {
 	 */
 	public String getHighCard2(){
 		return this.highCard2;
+	}
+	
+	/**
+	 * Accessor of highCard3
+	 * @return
+	 */
+	public String getHighCard3(){
+		return this.highCard3;
 	}
 	
 	/**
@@ -152,7 +165,6 @@ public class PokerHand {
 	 * @return
 	 */
 	private boolean isFourCard(){
-
 		int kind0 = getKind(cards[0]);
 		int kind1 = getKind(cards[1]);
 		int kind2 = getKind(cards[2]);
@@ -177,6 +189,84 @@ public class PokerHand {
 		
 		return false;
 	}
+	
+	/**
+	 * Check if the hand is three cards of a kind
+	 * @return
+	 */
+	private boolean isThreeCard(){
+		int kind0 = getKind(cards[0]);
+		int kind1 = getKind(cards[1]);
+		int kind2 = getKind(cards[2]);
+		int kind3 = getKind(cards[3]);
+		int kind4 = getKind(cards[4]);
+		
+		// first case, 1 to 3 cards
+		if(kind1 == kind0 && kind2 == kind0){
+			this.highCard1 = this.cards[0];
+			return true;
+		}
+		
+		// second case, 2 to 4 cards
+		if(kind2 == kind1 && kind3 == kind1){
+			this.highCard1 = this.cards[1];
+			return true;
+		}
+		
+		// third case, 3 to 5 cards
+		if(kind3 == kind2 && kind4 == kind2){
+			this.highCard1 = this.cards[2];
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Check if the hand is Full House
+	 * @return
+	 */
+	private boolean isFullHouse(){
+		// first case, 1 to 3 cards
+		if(this.highCard1 == this.cards[0]){
+			int kind3 = getKind(this.cards[3]);
+			int kind4 = getKind(this.cards[4]);
+			
+			this.highCard2 = this.cards[3];
+			// another pair
+			if(kind3 == kind4){
+				return true;
+			} else {
+				this.highCard3 = this.cards[3];
+				return false;
+			}
+		}
+		
+		// second case, 2 to 4 cards
+		if(this.highCard1 == this.cards[1]){
+			this.highCard2 = this.cards[0];
+			this.highCard3 = this.cards[4];
+			return false;
+		}
+		
+		// third case, 3 to 5 cards
+		if(this.highCard1 == this.cards[2]){
+			int kind0 = getKind(this.cards[0]);
+			int kind1 = getKind(this.cards[1]);
+			
+			this.highCard2 = this.cards[0];
+			// another pair
+			if(kind0 == kind1){
+				return true;
+			} else {
+				this.highCard3 = this.cards[1];
+				return false;
+			}
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Compare this hand with another hand
 	 * @param	hand another hand
