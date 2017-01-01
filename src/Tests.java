@@ -43,6 +43,37 @@ public class Tests
     {
         Test("Highest flush wins", win, "AS 3S 4S 8S 2S", "2H 3H 5H 6H 7H");
     }
+
+    @Test
+    public void FlushWinsStraight()
+    {
+        Test("Flush wins of straight", win, "2H 3H 5H 6H 7H", "2S 3H 4H 5S 6C");
+    }
+    
+    @Test
+    public void EqualStraightIsTie()
+    {
+	      Test("Equal straight is tie", tie, "2S 3H 4H 5S 6C", "3D 4C 5H 6H 2S");
+    }
+    
+    @Test
+    public void StraightWinsThreeCardsOfKind()
+    {
+        Test("Straight wins of three of a kind", win, "2S 3H 4H 5S 6C", "AH AC 5H 6H AS");
+    }
+    
+    @Test
+    public void ThreeCardsOfKindWinsTwoPairs()
+    {
+        Test("3 Of a kind wins of two pair", loss, "2S 2H 4H 5S 4C", "AH AC 5H 6H AS");
+    }
+     
+    @Test
+    public void TwoPairsWinsOnePair()
+    {
+        Test("2 Pair wins of pair", win, "2S 2H 4H 5S 4C", "AH AC 5H 6H 7S");
+
+    }
     
     private void Test(String description, PokerHand.Result expected, String playerHand, String opponentHand)
     {

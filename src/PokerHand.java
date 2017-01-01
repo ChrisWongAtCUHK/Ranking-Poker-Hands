@@ -72,7 +72,7 @@ public class PokerHand {
 		} else if(isTwoPairs()){
 			this.rank = 2;
 		} else if(isOnePair()){
-			this.rank = 2;
+			this.rank = 1;
 		} else {
 			this.rank = 0;
 			for(int i = 0; i < this.kinds.length; i++){
