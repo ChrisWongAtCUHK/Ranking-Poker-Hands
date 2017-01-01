@@ -10,7 +10,7 @@ import java.util.Comparator;
  */
 public class PokerHand {
 	private final String[] KINDS = {"2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"};
-	private final String[] SUITS = {"S", "H", "D", "C"};
+
 	private String[] cards;
 	private int rank;
 	private String highCard1;
@@ -40,11 +40,10 @@ public class PokerHand {
 			}
 			
 		});		
-	
-		// if kinds are all consecutive, it is straight
-		if(isStraight()){
-			this.rank = 4;
-			
+
+		boolean isStraight = isStraight();
+		boolean isFlush = isFlush();
+		if(isStraight){			
 			if(getKind(cards[3]) == 3 && getKind(cards[4]) == 12){
 				// special case: 2 3 4 5 A
 				this.highCard1 = cards[3];
@@ -54,9 +53,17 @@ public class PokerHand {
 			}
 			
 		} else {
-			this.rank = 0;
 			this.highCard1 = cards[4];
+		} 
+		
+		if(isStraight && isFlush){
+			this.rank = 8;
+		} else if(isFlush){
+			this.rank = 5;
+		} else if(isStraight){
+			this.rank = 4;
 		}
+		
 	}
 	
 	/**
@@ -95,6 +102,7 @@ public class PokerHand {
 		for(int i = 0; i < this.cards.length - 1; i++){
 			int kind1 = getKind(cards[i]);
 			int kind2 = getKind(cards[i + 1]);
+			// not the consecutive kind
 			if(kind2 != kind1 + 1){
 				// special case: 2 3 4 5 A
 				if(kind1 == 3 && kind2 == 12){
@@ -114,6 +122,12 @@ public class PokerHand {
 	 */
 	private boolean isFlush(){
 		boolean isFlush = true;
+		for(int i = 0; i < this.cards.length - 1; i++){
+			// not the same suit
+			if(!cards[i].substring(1, 2).equals(cards[i + 1].substring(1, 2))){
+				return false;
+			}
+		}
 		return isFlush;
 	}
 	
