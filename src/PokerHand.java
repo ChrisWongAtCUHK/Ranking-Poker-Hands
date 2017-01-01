@@ -8,6 +8,8 @@ import java.util.Comparator;
  *
  */
 public class PokerHand {
+	public enum Result { TIE, WIN, LOSS }
+	
 	private final String[] KINDS = {"2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"};
 
 	private String[] cards;
@@ -62,6 +64,9 @@ public class PokerHand {
 			}
 		} else if(isFlush){
 			this.rank = 5;
+			
+			// this line is avoid special case
+			this.highKinds.add(this.kinds[4]);
 		} else if(isStraight){
 			this.rank = 4;
 		} else if(isTwoPairs()){
