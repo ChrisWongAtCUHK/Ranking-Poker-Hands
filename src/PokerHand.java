@@ -13,13 +13,13 @@ public class PokerHand
     public enum Result { TIE, WIN, LOSS } 
     
     // Rank of hands
-    public static final int ONE = 1;
-    public static final int TWO = 2;
-    public static final int THREE = 3;
+    public static final int ONE_PAIR = 1;
+    public static final int TWO_PAIR = 2;
+    public static final int THREE_OF_A_KIND = 3;
     public static final int STRAIGHT = 4;
     public static final int FLUSH = 5;
     public static final int FULL_HOUSE = 6;
-    public static final int FOUR = 7;
+    public static final int FOUR_OF_A_KIND = 7;
     public static final int STRAIGHT_FLUSH = 8;
     private int handRank;
     
@@ -32,9 +32,10 @@ public class PokerHand
                 .map(Poker::new)
                 .sorted(Comparator.comparingInt(Poker::ranking).reversed())
                 .collect(Collectors.toList());
-
+        
         boolean flush = isFlush();
         boolean straight = isStraight();
+        
         if (straight) {
             handRank = flush ? STRAIGHT_FLUSH : STRAIGHT;
         } else if (flush) {
@@ -45,26 +46,26 @@ public class PokerHand
                     .collect(Collectors.groupingBy(Poker::ranking, LinkedHashMap::new, Collectors.counting()));
             
             if (counter.containsValue(4L)) {
-                handRank = FOUR;
+                handRank = FOUR_OF_A_KIND;
             } else {
-                int pairCount = (int) counter.values().stream().filter(i -> i == 2).count();
+                int pairCount = (int) counter.values().stream().filter(i -> i == 2L).count();
                 
                 if (counter.containsValue(3L)) {
-                    handRank = pairCount == 1 ? FULL_HOUSE : THREE;
+                    handRank = pairCount == 1 ? FULL_HOUSE : THREE_OF_A_KIND;
                 } else {
                     switch (pairCount) {
                     case 2:
-                        handRank = TWO;
+                        handRank = TWO_PAIR;
                         break;
                     case 1:
-                        handRank = ONE;
+                        handRank = ONE_PAIR;
                         break;
                     }
                 }
             }
         }
     }
-
+    
     public Result compareWith(PokerHand hand)
     {
         int comp = Integer.compare(handRank, hand.handRank);
@@ -78,37 +79,45 @@ public class PokerHand
             // only need to compare the highest rank card
             comp = Integer.compare(pokers.get(0).ranking(), hand.pokers.get(0).ranking());
             return comp > 0 ? Result.WIN : comp < 0 ? Result.LOSS : Result.TIE;
-        case FOUR:
+        case FOUR_OF_A_KIND:
             return compareRank(hand, 4L);
         case FULL_HOUSE:
-        case THREE:
+        case THREE_OF_A_KIND:
             return compareRank(hand, 3L);
-        case TWO:
-        case ONE:
+        case TWO_PAIR:
+        case ONE_PAIR:
             return compareRank(hand, 2L);
         default:
-            // nothing, just compare all cards in descending order
-            List<Integer> player = pokers.stream().map(Poker::ranking).collect(Collectors.toList());
-            List<Integer> opponent = hand.pokers.stream().map(Poker::ranking).collect(Collectors.toList());
+            // Flush or High card, just compare all cards in descending order
+            Iterator<Integer> player = pokers.stream().map(Poker::ranking).iterator();
+            Iterator<Integer> opponent = hand.pokers.stream().map(Poker::ranking).iterator();
             return compareCards(player, opponent);
         }
     }
     
     private boolean isStraight() {
-        // required to be sorted by RANKING
-        IntPredicate predicate = i -> Math.abs(pokers.get(i).ranking() - pokers.get(i + 1).ranking()) == 1; 
+        // required to be sorted by RANKING in descending order
+        IntPredicate predicate = i -> pokers.get(i).ranking() - pokers.get(i + 1).ranking() == 1;
         
-        // A5432 is also a straight
-        return pokers.get(0).rank() == 'A' && IntStream.range(1, pokers.size() - 1).allMatch(predicate)
-                || IntStream.range(0, pokers.size() - 1).allMatch(predicate);
+        if (!IntStream.range(1, pokers.size() - 1).allMatch(predicate))
+            return false;
+        
+        // Special case - A5432 is a five-high straight
+        if (pokers.get(0).rank() == 'A' && pokers.get(1).rank() == '5') {
+            pokers.add(pokers.remove(0)); // A5432 -> 5432A
+            return true;
+        } else {
+            return predicate.test(0);
+        }
     }
     
     private boolean isFlush() {
         return IntStream.of('S', 'H', 'D', 'C').anyMatch(s -> pokers.stream().allMatch(p -> p.suit() == s));
     }
-
+    
     // compare the "dominant" rank of the hand first, then compare the rest
-    // e.g. AAABB is a full house hand with A as dominant rank
+    // e.g. Full house AAABB - A is the dominant rank
+    // e.g. Two pair AABBC - A and B are dominant ranks
     private Result compareRank(PokerHand hand, long dominantCount) {
         Map<Boolean, List<Integer>> player = getRankFor(dominantCount);
         Map<Boolean, List<Integer>> opponent = hand.getRankFor(dominantCount);
@@ -124,9 +133,13 @@ public class PokerHand
                 .collect(Collectors.partitioningBy(e -> e.getValue() == dominantCount, Collectors.mapping(Map.Entry::getKey, Collectors.toList())));
     }
     
-    private static Result compareCards(List<Integer> player, List<Integer> opponent) {
-        for (Iterator<Integer> p = player.iterator(), o = opponent.iterator(); p.hasNext(); ) {
-            int comp = p.next().compareTo(o.next());
+    private static Result compareCards(Iterable<Integer> player, Iterable<Integer> opponent) {
+        return compareCards(player.iterator(), opponent.iterator());
+    }
+    
+    private static Result compareCards(Iterator<Integer> player, Iterator<Integer> opponent) {
+        while (player.hasNext()) {
+            int comp = player.next().compareTo(opponent.next());
             if (comp != 0)
                 return comp > 0 ? Result.WIN : Result.LOSS;
         }
